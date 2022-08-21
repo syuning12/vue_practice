@@ -1,0 +1,149 @@
+<template>
+  <b-container fluid>
+    <!--Search Controls-->
+    <b-row>
+      <b-col md="6" class="my-1">
+        <b-form-group horizontal label="Filter" class="mb-0">
+          <b-input-group>
+            <b-form-input v-model="filter" placeholder="Type to Search" />
+            <b-input-group-append>
+              <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
+            </b-input-group-append>
+          </b-input-group>
+        </b-form-group>
+      </b-col>
+      <b-col md="6" class="my-1">
+        <b-form-group horizontal label="Sort" class="mb-0">
+          <b-input-group>
+            <b-form-select v-model="sortBy" :options="sortOptions">
+              <option slot="first" :value="null">-- none --</option>
+            </b-form-select>
+            <b-form-select :disabled="!sortBy" v-model="sortDesc" slot="append">
+              <option :value="false">Asc</option>
+              <option :value="true">Desc</option>
+            </b-form-select>
+          </b-input-group>
+        </b-form-group>
+      </b-col>
+      <b-col md="6" class="my-1">
+        <b-form-group horizontal label="Sort direction" class="mb-0">
+          <b-input-group>
+            <b-form-select v-model="sortDirection" slot="append">
+              <option value="asc">Asc</option>
+              <option value="desc">Desc</option>
+              <option value="last">Last</option>
+            </b-form-select>
+          </b-input-group>
+        </b-form-group>
+      </b-col>
+      <b-col md="6" class="my-1">
+        <b-form-group horizontal label="Per page" class="mb-0">
+          <b-form-select :options="pageOptions" v-model="perPage" />
+        </b-form-group>
+      </b-col>
+    </b-row>
+    <!--Search Controls-->
+
+    <!-- Main table element -->
+    <b-table
+      show-empty
+      stacked="md"
+      :items="items"
+      :fields="fields"
+      :current-page="currentPage"
+      :per-page="perPage"
+      :filter="filter"
+      :sort-by.sync="sortBy"
+      :sort-desc.sync="sortDesc"
+      :sort-direction="sortDirection"
+      @filtered="onFiltered"
+    >
+      <template slot="truck_number" slot-scope="row"
+        >{{row.value.driver_truck}}</template
+      >
+      <template slot="trailer_number" slot-scope="row"
+        >{{row.value.driver_trailer}}</template
+      >
+      <template slot="violation_date" slot-scope="row"
+        >{{row.value.violation_date}}</template
+      >
+      <!-- View Specific Violation -->
+      <template slot="actions" slot-scope="row">
+        <b-button
+          @click="getSpecificViolation(logbook_id)"
+          id="view_specific_violation"
+          >View Violation</b-button
+        >
+      </template>
+    </b-table>
+
+    <b-row>
+      <b-col md="6" class="my-1">
+        <b-pagination
+          :total-rows="totalRows"
+          :per-page="perPage"
+          v-model="currentPage"
+          class="my-0"
+        />
+      </b-col>
+    </b-row>
+  </b-container>
+</template>
+
+<script>
+
+  export default {
+    data () {
+      return {
+        items: items,
+        fields: [
+          { key: 'truck_number', label: 'Truck Number', sortable: true, 'class': 'text-center' },
+          { key: 'trailer_number', label: 'Trailer Number', sortable: true, 'class': 'text-center' },
+          { key: 'violation_date', label: 'Date of Violation' },
+          { key: 'actions', label: 'Actions' }
+        ],
+        currentPage: 1,
+        perPage: 5,
+        totalRows: items.length,
+        pageOptions: [ 5, 10, 15 ],
+        sortBy: null,
+        sortDesc: false,
+        sortDirection: 'asc',
+        filter: null,
+      }
+    },
+    };
+    computed: {
+      sortOptions () {
+        return this.fields
+          .filter(f => f.sortable)
+          .map(f => { return { text: f.label, value: f.key } })
+      }
+    };
+    components:{
+        allViolations
+    };
+    data: {
+        allViolations:[]
+    };
+    beforeMount(){
+        allViolations=[];
+    };
+
+    methods: {
+      onFiltered (filteredItems) {
+        // Trigger pagination to update the number of buttons/pages due to filtering
+        this.totalRows = filteredItems.length
+        this.currentPage = 1
+      }, 
+      //Send Request all Violations for Driver_ID
+      getAllViolations(driver_id) {
+          axios.get('all/violations/url',driver_id).then(data=>{
+            this.$store.dispatch('setAllViolation',{driver_id,data}).then(()=>{
+                  this.$router.push('allViolation');
+            })
+          })
+      }
+    }
+  
+</script>

@@ -1,0 +1,173 @@
+<!-- 
+  1. 先把option選擇製作好，第二層的顯示方式：-1是未顯示，所以長度>0時，顯示他的childrens.value.
+  2. 把每個選項帶入value的值 能夠判斷是選擇哪個
+  3. 當選擇第一層時parentchange觸發event，如果是選擇-1(就是沒選項)要清掉第二層的選單，所以在第一層跟第二層要綁定v-model
+  4. 如果選擇第一層是-1之外的，然後第二層讓他顯示”請選擇“，宣告一個東西把他push
+  5. 當他選擇第二層資料時，把資料用foreach一個一個帶入進去，if,pid（用來判斷第二層）等於parentID時，把item push進去
+  6. 送出資料，如果資料不等於空值，顯示結果
+ -->
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Edit</title>
+  </head>
+
+  <body>
+    <form>
+      <div id="app">
+        第一層:
+        <select name="parent" v-model.number="parentid" v-on:change="ParetnChange">
+				<option value="-1">請選擇</option>
+         <option value="1">A</option>
+          <option value="2">B</option>
+          <option value="3">C</option>
+</select>
+        <br /> 第二層:
+        <select name="children" v-model.number="childrenid">
+                <option v-for="(c,index) in childrens" v-if="childrens.length > 0" v-bind:value="c.Value" > 
+								<!--留意 c 物件屬性有區分大小寫-->
+                    {{c.Text}}
+                </option>
+            </select>
+        <br />
+        <button type="button" v-on:click.prevent="MySubmit">送出</button>
+        <hr />
+        <div v-if="showResult!==''">
+          送出資料↓
+          <br /> {{showResult}}
+        </div>
+      </div>
+    </form>
+    <!-- 引用jQuery 目的要發Ajax -->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <!--引用Vue.js -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.22/dist/vue.js"></script>
+    <script type="text/javascript">
+      let data = [{
+        "id": 1,
+        "pid": 0,
+        "text": "A"
+      }, {
+        "id": 2,
+        "pid": 0,
+        "text": "B"
+      }, {
+        "id": 3,
+        "pid": 0,
+        "text": "C"
+      }, {
+        "id": 4,
+        "pid": 1,
+        "text": "a"
+      }, {
+        "id": 5,
+        "pid": 1,
+        "text": "aa"
+      }, {
+        "id": 6,
+        "pid": 1,
+        "text": "aaa"
+      }, {
+        "id": 7,
+        "pid": 2,
+        "text": "b"
+      }, {
+        "id": 8,
+        "pid": 2,
+        "text": "bb"
+      }, {
+        "id": 9,
+        "pid": 2,
+        "text": "bbb"
+      }, {
+        "id": 10,
+        "pid": 3,
+        "text": "c"
+      }, {
+        "id": 11,
+        "pid": 3,
+        "text": "cc"
+      }, {
+        "id": 12,
+        "pid": 3,
+        "text": "ccc"
+      }];
+
+      let parentid = 2; //user在DB裡第一層選單的值 
+      let childrenid = 9; //user在DB裡第二層選單的值
+      let childrensArry = [{
+          "Text": "請選擇",
+          "Value": "-1"
+        },
+        {
+          "Text": "b",
+          "Value": "7"
+        }, {
+          "Text": "bb",
+          "Value": "8"
+        }, {
+          "Text": "bbb",
+          "Value": "9"
+        }
+      ];
+
+    </script>
+
+
+    <!--javascript，通常在.js檔裡-->
+    <script type="text/javascript">
+      let app = new Vue({
+        el: "#app",
+        data: {
+          parentid: parentid,
+          childrenid: childrenid,
+          childrens: childrensArry,
+          showResult: "" //顯示送出的資料(Json格式)
+        },
+        methods: {
+          ParetnChange: function($event) {
+            let vm = this;
+            if (vm.parentid === -1) { //清掉第二層選單
+              vm.childrenid = -1;
+              vm.childrens = [];
+              return;
+            }
+
+
+
+
+            let arry = new Array();
+            arry.push({
+              Text: "請選擇",
+              Value: -1
+            });
+            data.forEach(function(item, index) {
+              if (item.pid === vm.parentid) {
+                arry.push({
+                  Text: item.text,
+                  Value: item.id
+                });
+              } //end if 
+            });
+
+            vm.childrens = arry;
+            vm.childrenid = -1; //第二層menu變更綁定「請選擇」
+
+
+          },
+          MySubmit: function($event) {
+            let vm = this;
+            vm.showResult = JSON.stringify({
+              parentid: vm.parentid,
+              childrenid: vm.childrenid
+            });
+          }
+        }
+      });
+
+    </script>
+  </body>
+
+</html>

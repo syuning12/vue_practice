@@ -1,0 +1,191 @@
+<template>
+ <div>
+
+  <b-form-select
+      label="Country"
+      v-model="reportFilterData.country"
+      :options="showCountries()"
+  ></b-form-select>
+
+  <b-form-select
+      v-if="reportFilterData.country"
+      label="City"
+      v-model="reportFilterData.city"
+      :options="showCities()"
+  ></b-form-select>
+
+  <b-form-select
+      v-if="reportFilterData.city"
+      label="Region"
+      v-model="reportFilterData.region"
+      :options="showRegions()"
+  ></b-form-select>
+
+  <b-form-select
+      v-if="reportFilterData.region"
+      label="Site"
+      v-model="reportFilterData.site"
+      :options="showSites()"
+  ></b-form-select>
+
+  <b-form-select
+      :label="Floor"
+      v-model="reportFilterData.floor"
+      :options="showFloors()"
+  ></b-form-select>
+ </div>
+</template>
+
+
+// selectItem
+private Areas: any = [
+    {
+        id: "taiwan",
+        text: "Taiwan",
+        sub: [
+            {
+                id: "taipei",
+                text: "Taipei",
+                sub: [
+                    {
+                        id: "daan",
+                        text: "Daan",
+                        sub: [
+                            {
+                                id: "daan1",
+                                text: "Daan1",
+                                sub: [
+                                    { id: "daan1_1f", text: "1F" },
+                                    { id: "daan1_2f", text: "2F" },
+                                    { id: "daan1_2f", text: "3F" }
+                                ]
+                            },
+                            {
+                                id: "daan2",
+                                text: "Daan2",
+                                sub: [
+                                    {
+                                        id: "daan2_11f",
+                                        text: "11F"
+                                    },
+                                    {
+                                        id: "daan2_22f",
+                                        text: "12F"
+                                    },
+                                    {
+                                        id: "daan2_33f",
+                                        text: "13F"
+                                    }
+                                ]
+                            },
+                            {
+                                id: "daan3",
+                                text: "Daan3",
+                                sub: [{ id: "daan3_5f", text: "5F" }]
+                            }
+                        ]
+                    },
+                    {
+                        id: "sinyi",
+                        text: "Sinyi",
+                        sub: [
+                            { id: "sinyi1", text: "Sinyi1", sub: [] },
+                            { id: "sinyi2", text: "Sinyi2", sub: [] },
+                            { id: "sinyi3", text: "Sinyi3", sub: [] }
+                        ]
+                    },
+                    { id: "wunshan", text: "Wunshan", sub: [] }
+                ]
+            },
+            {
+                id: "taichung",
+                text: "Taichung",
+                sub: [
+                    { id: "south", text: "South", sub: [] },
+                    { id: "west", text: "West", sub: [] },
+                    { id: "north", text: "North", sub: [] }
+                ]
+            },
+
+            {
+                id: "kaohsiung",
+                text: "Kaohsiung",
+                sub: [
+                    { id: "gushan", text: "Gushan", sub: [] },
+                    { id: "zuoying", text: "Zuoying", sub: [] },
+                    { id: "siaogang", text: "Siaogang", sub: [] }
+                ]
+            }
+        ]
+    },
+    {
+        id: "china",
+        text: "China",
+        sub: [
+            { id: "hk", text: "Hong Kong", sub: [] },
+            { id: "bj", text: "BeiJing", sub: [] },
+            { id: "xm", text: "Xia Men", sub: [] }
+        ]
+    }
+];
+
+showOptions(level: number, refid?: string[]) {
+    function deepTrace(
+        areabase: AreaUnit[],
+        targetLevel: number = 0,  // 目標level
+        level: number = 0,        // 當前level
+        refid?: string[]          // 比對的id
+    ): AreaUnit[] | undefined {
+        // 目標level小於當前level，不執行函數
+        if (targetLevel < level) return;
+
+        // 目標level和當前level相同
+        if (targetLevel === level) {
+            return areabase.map((item, index) => {
+                let { id, text } = item;
+                return { id, text };
+            });
+        } else {
+            // 目標level和當前leval不相同
+            for (let area of areabase) {
+                if (area.id !== refid[level]) continue;
+                return deepTrace(area.sub, targetLevel, level + 1, refid);
+            }
+            return;
+        }
+    }
+
+    return deepTrace(this.Areas, level, 0, refid);
+}
+
+showCountries() {
+    return this.showOptions(0);
+}
+
+showCities() {
+    return this.showOptions(1, [this.reportFilterData.country]);
+}
+
+showRegions() {
+    return this.showOptions(2, [
+        this.reportFilterData.country,
+        this.reportFilterData.city
+    ]);
+}
+
+showSites() {
+    return this.showOptions(3, [
+        this.reportFilterData.country,
+        this.reportFilterData.city,
+        this.reportFilterData.region
+    ]);
+}
+
+showFloors() {
+    return this.showOptions(4, [
+        this.reportFilterData.country,
+        this.reportFilterData.city,
+        this.reportFilterData.region,
+        this.reportFilterData.site
+    ]);
+}

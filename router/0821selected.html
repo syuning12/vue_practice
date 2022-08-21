@@ -1,0 +1,77 @@
+<template>
+  <!-- Export -->
+ <b-navbar toggleable type="light" variant="light">
+   <b-nav is-nav-bar>
+<b-nav-item>
+ <b-form-select v-model="selected" v-on:change="getSelectedItem" style="width:auto">
+   <template slot="first">
+   <option :value="null" disabled>-- Select project --</option>
+ </template>
+   <option v-for="project in projects" v-bind:value="project.value">{{ project.id }} {{ project.title }}
+   </option>
+ </b-form-select>
+</b-nav-item>
+   </b-nav>
+<b-nav is-nav-bar>
+<b-nav-item>
+ <b-button v-on:click="exportXML();">Export as XML</b-button>
+</b-nav-item>
+   </b-nav>
+ </b-navbar>
+
+
+ <b-form-select
+v-model="someobject.state"   <!--This is only used to bind the UI to data for display. In this case the state of the object. It can be anything in the VUE app's context, aka data:{}-->
+v-on:change="getSelectedItem" <!--will call the func getSelectedItem with 1 argument, the value of the newly selected item.-->
+/>
+  .... methods: {
+          getSelectedItem: function(myarg) { // Just a regular js function that takes 1 arg
+          console.log(myarg);
+          }, .... 
+
+<b-form-select
+v-model="someobject.state"  <!--This is only used to bind the UI to data for display. In this case the state of the object. It can be anything in the VUE app's context, aka data:{}-->
+v-on:change="getSelectedItem($event, someobject.id)" <!--will call the func getSelectedItem with 2 arguments, the value of the newly selected item, and the id of a previously defined object.-->
+/>
+
+.... methods: {
+getSelectedItem: function(newObjectState, objectId) { // Just a regular js function that takes 2 args
+  console.log(newObjectState + " --- " + objectId);
+  updateObjectState(objectId, newObjectState)
+ }, ....
+
+ methods: { getSelectedItem: function(selected) {
+console.log(selected);
+}, exportXML: function(selected) {
+console.log(selected);
+this.$http.get(
+'http://localhost:8080/api/exports/' + selected,
+});
+} }
+
+</template>
+
+
+<script>
+  const app = Vue.createApp({
+    data() {
+      return {
+        form: {
+          bill: '',
+          name: '',
+          selected: ''
+        },
+        show: true
+      }
+    },
+      methods: {    getSelectedItem: function() {
+               console.log(this.selected);
+               },    exportXML: function() {
+                console.log(this.selected);
+                this.$http.get('http://localhost:8080/api/exports/' + this.selected,
+              });
+               
+            }
+
+          
+</script>

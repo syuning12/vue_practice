@@ -1,0 +1,43 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.js"></script>
+<script src="https://unpkg.com/bootstrap-vue@2.21.2/dist/bootstrap-vue.js"></script>
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/bootstrap-vue@2.21.2/dist/bootstrap-vue.css"
+/>
+<div id="app">
+  <b-form-select
+    v-model="networkAudience.source"
+    :options="sources"
+    value-field="value"
+    text-field="label"
+  ></b-form-select>
+  <div>Selected Option: <strong>{{ networkAudience.source }}</strong></div>
+  <button type="submit" @click="submitForm()">Submit</button>
+</div>
+
+<script>
+  new Vue({
+    el: "#app",
+    data: {
+      networkAudience: {
+        source: "",
+        name: "",
+      },
+      sources: [
+        {
+          value: "Group1",
+          label: "Group1",
+        },
+        {
+          value: "Group2",
+          label: "Group2",
+        },
+      ],
+    },
+    methods: {
+      submitForm() {
+        console.log(this.networkAudience);
+      },
+    },
+  });
+</script>

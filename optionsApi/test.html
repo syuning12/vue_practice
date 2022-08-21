@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Methods</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="images/favicon.ico" rel="shortcut icon">
+        <meta charset="UTF-8">
+        <script src="/javascripts/vendor.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.0.2/vue.global.js"></script>
+    </head>
+    <body class="bg-lighter">
+ 
+
+<div id="app">
+
+  <ul>
+    <li v-for="item in products">
+        {{item.name}} / {{item.price}}
+        <button @click="addtocart(item)">add to cart</button>
+    </li>
+  </ul>
+  ...
+  <h6>購物車項目</h6>
+    <li v-for="product in carts">{{product.name}}</li>
+  <ul>
+    
+  </ul>
+  總金額 {{sum}}
+
+
+  <h3>作為 $filter 使用（取代複雜表達式）</h3>
+  {{`NT$ ${sum}`}}
+
+</div>
+
+<!-- 
+    1. 先將products的商品顯示出來
+    2. 點選button暫存到addtocart(item), 所以能看到console.log
+    3. 接著將暫存起來的item push到 product in carts,顯示product.name
+    4. 計算總金額部分寫到方法calcuate,確認addtocart點擊時會觸發this.calcuate
+    5. 在calcuate裡計算總金額，將存放在product裡的每個項目做total計算
+    6. 最後把這個total放在data的sum，並回傳到html
+ -->
+
+
+<script>
+const App = {
+  data() {
+    return {
+      num: 10,
+      products: [
+        {
+          name: '蛋餅',
+          price: 30,
+          vegan: false
+        },
+        {
+          name: '飯糰',
+          price: 35,
+          vegan: false
+        },
+        {
+          name: '小籠包',
+          price: 60,
+          vegan: false
+        },
+        {
+          name: '蘿蔔糕',
+          price: 30,
+          vegan: true
+        },
+      ],
+      carts: [],
+      sum: 0,
+    }
+  },
+  methods: {
+    addtocart(item){
+        console.log(item);
+        this.carts.push(item);
+        this.calcuate();
+    },
+    calcuate(){
+        console.log('calcuate');
+        let total=0;
+        this.carts.forEach(product =>{
+            total = total + product.price;
+        });
+        console.log(total);
+        this.sum=total;
+    },
+   
+  },
+ 
+};
+Vue.createApp(App).mount('#app');
+</script>
+
+<!-- 🙇🙇練習結束🙇🙇 -->
+</main>
+  
+  
+<link rel="stylesheet" href="/stylesheets/all.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+</body>
+</html>
